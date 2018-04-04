@@ -1,0 +1,112 @@
+<html lang="pt-br" ng-app="app">
+<head>
+<title>Testing caches</title>
+
+</head>
+<body>
+	<div><input type="text" id="cacheName" value="test-cache"></div>
+	<div><input type="text" id="requestName" value="app-cache-new-request.html"></div>
+	
+	<button class="btn btn-primary" onclick="addRequestToCache()" >
+		Add request to Cache
+	</button>
+	<button class="btn btn-primary" onclick="checkAllCachedRequests()" >
+		Check All Caches request
+	</button>
+	<button class="btn btn-primary" onclick="findRequestCache()" >
+		Find request Cache
+	</button>
+	<button class="btn btn-primary" onclick="deleteRequestCache()" >
+		Delete Request Cache
+	</button>
+	<button class="btn btn-primary" onclick="checkExistingCaches()" >
+		Existing Caches
+	</button>
+	<button class="btn btn-primary" onclick="deleteCache()" >
+		Delete Request Cache
+	</button>
+
+	<script language="JavaScript" type="application/javascript">
+	
+		// https://davidwalsh.name/cache
+	
+		if('caches' in window) {
+			// Has support!
+			console.log("Has caches support!");
+		}
+
+		addRequestToCache = function() {
+			console.log('adding to cache...');
+			let cn = document.getElementById('cacheName').value;
+			let rn = document.getElementById('requestName').value;
+			caches.open(cn).then(function(cache) {
+				// Cache is created and accessible
+				
+				// adds new request to cache
+				cache.add(new Request('app-cache-new-request.html', { /* request options */ }));
+				
+				// adds url array to cache
+				cache.addAll(['landscape.jpg'])
+				.then(function() { 
+					console.log("Cached!");
+				});
+			});
+		};
+		
+		checkAllCachedRequests = function () {
+			let cn = document.getElementById('cacheName').value;
+			caches.open(cn).then(function(cache) {
+				cache.keys().then(function(cachedRequests) { // [Request, Request]
+					cachedRequests.forEach( req => {
+						console.log(req);
+					});
+				});
+			});
+		};
+		
+		findRequestCache = function () {
+			let cn = document.getElementById('cacheName').value;
+			let rn = document.getElementById('requestName').value;
+			caches.open(cn).then(function(cache) {
+				cache.match(rn)
+				.then(function(matchedResponse) {
+					if(matchedResponse) {
+						console.log('found: ', matchedResponse);
+					} else {
+						console.log('not found: ', rn);
+					}
+				});
+			});
+		};
+		
+		deleteRequestCache = function () {
+			let cn = document.getElementById('cacheName').value;
+			let rn = document.getElementById('requestName').value;
+			caches.open(cn).then(function(cache) {
+				cache.delete(rn).then(function() { 
+					console.log('Request Cache successfully deleted!'); 
+				});
+			});
+		};
+		
+		checkExistingCaches = function () {
+			caches.keys().then(function(cacheKeys) { 
+				console.log(cacheKeys); // ex: ["test-cache"]
+			});
+		};
+		
+		deleteCache = function () {
+			let cn = document.getElementById('cacheName').value;
+			caches.delete(cn).then(function(deleted) {
+				if(deleted) {
+					console.log('Cache successfully deleted: ', cn);
+				} else {
+					console.log('Cache not found: ', cn);
+				}
+			});
+		};
+	</script>
+
+</body>
+</html>
+
